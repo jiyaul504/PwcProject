@@ -1,0 +1,687 @@
+﻿/*Loader*/
+.loader {
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    width: 100%;
+    height: 100%;
+    background-color: #eceaea;
+    background-image: url('../../img/loader.gif');
+    background-size: 50px;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 10000000;
+    opacity: 0.4;
+    filter: alpha(opacity=40);
+    text-align: center;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+    color: #000;
+    font-weight: bold;
+    font-size: 16px;
+    /*background-color: var(--primary-btn-color);*/
+    border: 1px solid #F2F2F2;
+    border-bottom: 4px solid #E1301E;
+    border-radius: 0px;
+    margin-bottom: -1px;
+    background: url(../img/top_arrwow.png) no-repeat center bottom;
+    /*font-family: 'Charter ITC Regular';*/
+}
+.navbar-light .navbar-nav .nav-link {
+    color: #000000;
+    padding: 12px 19px;
+}
+
+/*DatePicker*/
+/*[type="date"] {
+    background: #fff url(https://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/16x16/calendar_2.png) 97% 50% no-repeat;
+}
+
+[type="date"]::-webkit-inner-spin-button {
+    display: none;
+}
+
+[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0;
+}*/
+
+
+/* custom styles */
+
+label {
+    display: block;
+}
+
+.dropleft .dropdown-toggle::before {
+    vertical-align: 0;
+    color: #f2f2f2;
+}
+
+.btn:not(:disabled):not(.disabled) {
+    cursor: pointer;
+}
+
+.dropleft .dropdown-menu {
+    margin-top: 24px;
+    margin-right: 0px;
+    margin-left: 75px;
+    background-color: #000000;
+}
+
+.dropdown-item1.active, .dropdown-item1:active {
+    color: #fff;
+    text-decoration: none;
+    background-color: #000000;
+}
+
+.dropdown-item1:hover, .dropdown-item1:focus {
+    color: #ffffff;
+    text-decoration: none;
+    background-color: #000000;
+}
+
+.dropdown-item1 {
+    display: block;
+    width: 100%;
+    padding: 0.25rem 1.5rem;
+    clear: both;
+    font-weight: 400;
+    color: #ffffff;
+    text-align: inherit;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+    font-weight: bold;
+}
+
+.pos_absolute {
+    position: absolute;
+}
+
+.dropdown_alt {
+    padding: 0px;
+    margin-left: -11px;
+}
+
+.option_remove {
+    width: 16px !important;
+}
+
+.pagg_align .active {
+    border: none;
+    color: var(--default-bg-color);
+    background-color: #ffb600 !important;
+}
+
+/*CHECKBOX START*/
+.custom_container {
+    display: block;
+    position: relative;
+    padding-left: 25px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Hide the browser's default checkbox */
+.custom_container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+/* Create a custom checkbox */
+
+.custom-radio .custom-control-input:checked ~ .custom-control-label::before {
+    background-color: var(--primary-bg-color) !important;
+    box-shadow: none;
+}
+
+.custom_checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 17px;
+    width: 17px;
+    background-color: #eee;
+   /* border-radius: 50px;*/
+    box-sizing: border-box;
+    padding: 0;
+}
+
+/* Style its checked state...with a ticked icon */
+
+/* On mouse-over, add a grey background color */
+.custom_container:hover input ~ .custom_checkmark {
+    background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.custom_container input:checked ~ .custom_checkmark {
+    background-color: var(--primary-bg-color);
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.custom_checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+/* Show the checkmark when checked */
+.custom_container input:checked ~ .custom_checkmark:after {
+    display: block;
+}
+
+/* Style the checkmark/indicator */
+.custom_container .custom_checkmark:after {
+    left: 6px;
+    top: 3px;
+    width: 5px;
+    height: 10px;
+    bottom: 3px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+/*CHECKBOX END*/
+
+.tab-highligh {
+    background-color: var(--primary-btn-color) !important;
+    border: none !important;
+}
+
+.nav-pills .Custom_nav-link.active, .nav-pills .show > .Custom_nav-link {
+    color: #000;
+    background-color: #ffffff;
+    border: 1px solid #F2F2F2;
+    border-bottom: 3px solid #e0302b;
+    border-radius: 0px;
+    margin-bottom: -1px;
+}
+
+.nav-pills .Custom_nav-link {
+    border-radius: .25rem;
+    color: #000000;
+    border-right: 1px solid #f2f2f2;
+}
+
+.nav-pills .Custom_nav-link.active, .nav-pills .show > .Custom_nav-link {
+    color: var(--default-text-color);
+    background-color: var(--primary-btn-color);
+    border: 1px solid #F2F2F2;
+    border-radius: 0px;
+    margin-bottom: -1px;
+}
+
+
+/*Table Freeze Column*/
+.myapproval-list tr {
+    cursor: pointer;
+}
+
+.tables {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.tables td, .tables th {
+    margin: 0;
+    white-space: nowrap;
+    border-top-width: 0px;
+    border: none;
+}
+
+.table-wrapper .tables {
+    width: 100%;
+    overflow-x: scroll;
+    /*margin-left: 5em;*/
+    overflow-y: visible;
+    padding: 0;
+}
+
+.container-scroll {
+    overflow-x: auto;
+}
+
+.tables thead th {
+    vertical-align: bottom;
+    border-bottom: 0px solid #dee2e6;
+}
+
+.tables .headcol2 {
+    position: absolute;
+    width: 8em;
+    text-align: center;
+    right: 0;
+    top: auto;
+    border-top-width: 1px;
+    /*only relevant for first row*/
+    /*compensate for top border*/
+    background-color: #DEDEDE;
+}
+
+.tables .headcol3 {
+    position: absolute;
+    width: 8em;
+    text-align: center;
+    right: 8em;
+    top: auto;
+    border-top-width: 1px;
+    /*only relevant for first row*/
+    /*compensate for top border*/
+    background-color: #DEDEDE;
+}
+
+.tables .headcol4 {
+    position: absolute;
+    width: 8em;
+    text-align: center;
+    right: 16em;
+    top: auto;
+    border-top-width: 1px;
+    /*only relevant for first row*/
+    /*compensate for top border*/
+    background-color: #DEDEDE;
+}
+
+.tables .headcol5 {
+    position: absolute;
+    width: 8em;
+    text-align: center;
+    right: 24em;
+    top: auto;
+    border-top-width: 1px;
+    /*only relevant for first row*/
+    /*compensate for top border*/
+    background-color: #DEDEDE;
+}
+
+.tables .headcol:before {
+    content: 'Row ';
+}
+
+.tables th:last-child {
+    background-color: transparent;
+}
+
+.tables tr th:last-child {
+    background-color: #fafafa;
+}
+
+.tables tr:nth-of-type(odd) th:last-child {
+    background-color: #ffffff;
+}
+
+.tables tr:nth-of-type(even) th:last-child {
+    background-color: #fafafa;
+}
+
+ul.ui-autocomplete.ui-menu {
+    z-index: 1051;
+    height: 200px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+/*    ul.ui-autocomplete.ui-menu :hover {
+        background-color: #EB8C00
+    }*/
+
+.legalStyle {
+    color: #e0301e;
+    font-weight: bold;
+}
+
+.governmentClientStyle {
+/*    color: #175c2c;
+    font-weight:bold;*/
+}
+
+.auditHistoryWidth{
+    width:100%;
+}
+
+.display-none {
+    display: none;
+}
+
+/*approver History 2 bar Style*/
+#approver_history .progress-bar .step .bullet2 {
+    height: 35px;
+    width: 35px;
+    border: 0px solid #000;
+    display: inline-block;
+    border-radius: 50%;
+    position: relative;
+    transition: 0.2s;
+    font-weight: 500;
+    font-size: 17px;
+    line-height: 35px;
+    background-color: #f1f1f1;
+}
+
+    #approver_history .progress-bar .step .bullet2.active {
+        border-color: #175D2D;
+        background: #175D2D;
+    }
+
+    #approver_history .progress-bar .step .bullet2 span {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #175d2d !important;
+    }
+
+    #approver_history .progress-bar .step .bullet2.active span {
+        display: none;
+    }
+
+    #approver_history .progress-bar .step .bullet2:before,
+    #approver_history .progress-bar .step .bullet2:after {
+        position: absolute;
+        content: '';
+        bottom: 11px;
+        right: -565px;
+        height: 6px;
+        width: 565px;
+        background: #F1F1F1;
+    }
+
+    #approver_history .progress-bar .step .bullet2.active:after {
+        background: #175D2D;
+        transform: scaleX(0);
+        transform-origin: left;
+        animation: animate 0.3s linear forwards;
+    }
+
+#approver_history .progress-bar .step:last-child .bullet2:before,
+#approver_history .progress-bar .step:last-child .bullet2:after {
+    display: none;
+}
+
+#approver_history .progress-bar .step .bullet:before, #approver_history .progress-bar .step .bullet2:after {
+    right: -68px !important;
+    width: 70px !important;
+}
+
+#approver_history .progress-bar .step .bullet:before, #approver_history .progress-bar .step .bullet2:after {
+    background: transparent
+}
+
+@media (min-width: 992px) and (max-width:1400px) {
+    #approver_history .progress-bar .step .bullet:before, #approver_history .progress-bar .step .bullet2:after {
+        right: -565px !important;
+        width: 565px !important;
+    }
+}
+
+/*approver History 3 bar Style*/
+#approver_history .progress-bar .step .bullet3 {
+    height: 35px;
+    width: 35px;
+    border: 0px solid #000;
+    display: inline-block;
+    border-radius: 50%;
+    position: relative;
+    transition: 0.2s;
+    font-weight: 500;
+    font-size: 17px;
+    line-height: 35px;
+    background-color: #f1f1f1;
+}
+
+    #approver_history .progress-bar .step .bullet3.active {
+        border-color: #175D2D;
+        background: #175D2D;
+    }
+
+    #approver_history .progress-bar .step .bullet3 span {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #175d2d !important;
+    }
+
+    #approver_history .progress-bar .step .bullet3.active span {
+        display: none;
+    }
+
+    #approver_history .progress-bar .step .bullet3:before,
+    #approver_history .progress-bar .step .bullet3:after {
+        position: absolute;
+        content: '';
+        bottom: 11px;
+        right: -360px;
+        height: 6px;
+        width: 360px;
+        background: #F1F1F1;
+    }
+
+    #approver_history .progress-bar .step .bullet3.active:after {
+        background: #175D2D;
+        transform: scaleX(0);
+        transform-origin: left;
+        animation: animate 0.3s linear forwards;
+    }
+
+#approver_history .progress-bar .step:last-child .bullet3:before,
+#approver_history .progress-bar .step:last-child .bullet3:after {
+    display: none;
+}
+
+#approver_history .progress-bar .step .bullet:before, #approver_history .progress-bar .step .bullet3:after {
+    right: -68px !important;
+    width: 70px !important;
+}
+
+#approver_history .progress-bar .step .bullet:before, #approver_history .progress-bar .step .bullet3:after {
+    background: transparent
+}
+
+@media (min-width: 992px) and (max-width:1400px) {
+    #approver_history .progress-bar .step .bullet:before, #approver_history .progress-bar .step .bullet3:after {
+        right: -363px !important;
+        width: 390px !important;
+    }
+}
+
+
+/*approver History 4 bar Style*/
+#approver_history .progress-bar .step .bullet4 {
+    height: 35px;
+    width: 35px;
+    border: 0px solid #000;
+    display: inline-block;
+    border-radius: 50%;
+    position: relative;
+    transition: 0.2s;
+    font-weight: 500;
+    font-size: 17px;
+    line-height: 35px;
+    background-color: #f1f1f1;
+}
+
+    #approver_history .progress-bar .step .bullet4.active {
+        border-color: #175D2D;
+        background: #175D2D;
+    }
+
+    #approver_history .progress-bar .step .bullet4 span {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #175d2d !important;
+    }
+
+    #approver_history .progress-bar .step .bullet4.active span {
+        display: none;
+    }
+
+    #approver_history .progress-bar .step .bullet4:before,
+    #approver_history .progress-bar .step .bullet4:after {
+        position: absolute;
+        content: '';
+        bottom: 11px;
+        height: 6px;
+        right: -293px;
+        width: 293px;
+        background: #F1F1F1;
+    }
+
+    #approver_history .progress-bar .step .bullet4.active:after {
+        background: #175D2D;
+        transform: scaleX(0);
+        transform-origin: left;
+        animation: animate 0.3s linear forwards;
+    }
+
+#approver_history .progress-bar .step:last-child .bullet4:before,
+#approver_history .progress-bar .step:last-child .bullet4:after {
+    display: none;
+}
+
+#approver_history .progress-bar .step .bullet:before, #approver_history .progress-bar .step .bullet4:after {
+    right: -68px !important;
+    width: 70px !important;
+}
+
+#approver_history .progress-bar .step .bullet:before, #approver_history .progress-bar .step .bullet4:after {
+    background: transparent
+}
+
+@media (min-width: 992px) and (max-width:1400px) {
+    #approver_history .progress-bar .step .bullet:before, #approver_history .progress-bar .step .bullet4:after {
+        right: -297px !important;
+        width: 297px !important;
+    }
+}
+
+/*approver History 6 bar Style*/
+#approver_history .progress-bar .step .bullet6 {
+    height: 35px;
+    width: 35px;
+    border: 0px solid #000;
+    display: inline-block;
+    border-radius: 50%;
+    position: relative;
+    transition: 0.2s;
+    font-weight: 500;
+    font-size: 17px;
+    line-height: 35px;
+    background-color: #f1f1f1;
+}
+
+    #approver_history .progress-bar .step .bullet6.active {
+        border-color: #175D2D;
+        background: #175D2D;
+    }
+
+    #approver_history .progress-bar .step .bullet6 span {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #175d2d !important;
+    }
+
+    #approver_history .progress-bar .step .bullet6.active span {
+        display: none;
+    }
+
+    #approver_history .progress-bar .step .bullet6:before,
+    #approver_history .progress-bar .step .bullet6:after {
+        position: absolute;
+        content: '';
+        bottom: 11px;
+        right: -360px;
+        height: 6px;
+        width: 361px;
+        background: #F1F1F1;
+    }
+
+    #approver_history .progress-bar .step .bullet6.active:after {
+        background: #175D2D;
+        transform: scaleX(0);
+        transform-origin: left;
+        animation: animate 0.3s linear forwards;
+    }
+
+#approver_history .progress-bar .step:last-child .bullet6:before,
+#approver_history .progress-bar .step:last-child .bullet6:after {
+    display: none;
+}
+
+#approver_history .progress-bar .step .bullet6:before, #approver_history .progress-bar .step .bullet6:after {
+    right: -68px !important;
+    width: 70px !important;
+}
+
+#approver_history .progress-bar .step .bullet6:before, #approver_history .progress-bar .step .bullet6:after {
+    background: transparent
+}
+
+@media (min-width: 992px) and (max-width:1400px) {
+
+    #approver_history .progress-bar .step .bullet6:before, #approver_history .progress-bar .step .bullet6:after {
+        right: -196px !important;
+        width: 196px !important;
+        background: #f1f1f1;
+    }
+
+}
+
+.dgrid {
+    margin-top: 10% !important;
+}
+
+.heading_font {
+    font-family: var(--primary-font);
+}
+
+.title_font {
+    font-family: var(--second-font);
+    font-size: 18px;
+}
+
+.icon-weight {
+    font-weight: bold !important;
+}
+
+.custom-radius {
+    border-radius: 0;
+    outline: none !important;
+}
+
+.title-font-charter_21 {
+    font-family: var(--second-font);
+    font-size: 17px;
+    /* font-weight: 600; */
+}
+
+.heading-font-charter_21 {
+    font-family: var(--primary-font);
+    font-size: 17px;
+    /* font-weight: 600; */
+}
+
+.required:after {
+    content: " *";
+    color: red;
+}
+
+.popup_ColorCode {
+    color: #d04a02;
+}
+
+.widget_weight{
+    font-size:45px;
+}

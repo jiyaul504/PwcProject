@@ -1,0 +1,1026 @@
+﻿<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="~/js/Request.js"></script>
+@{
+    var isSuperAdmin = User?.Claims?.FirstOrDefault(c => c.Type == UserPWC.Utilities.ApplicationConstants.Claims.IS_SUPER_ADMIN)?.Value;
+    var userRoleID = Convert.ToInt32(User?.Claims?.FirstOrDefault(c => c.Type == UserPWC.Utilities.ApplicationConstants.Claims.USER_ROLE_ID)?.Value);
+    var Designation = Convert.ToInt32(User?.Claims?.FirstOrDefault(c => c.Type == UserPWC.Utilities.ApplicationConstants.Claims.DESIGNATION_ID)?.Value);
+    var colSize1 = ViewBag.PageType == UserPWC.Utilities.PageTypes.MyRequest ? 7 : 8;
+    var colSize2 = ViewBag.PageType == UserPWC.Utilities.PageTypes.MyRequest ? 5 : 4;
+}
+
+<div id="loaders" class="loader" style="display:none"></div>
+<form method="post" asp-controller="ExcelExport" asp-action="MyRequestExport">
+    <div class="container-fluid bg_grey">
+        <div class="row m_auto py-2">
+            @if (ViewBag.PageType == UserPWC.Utilities.PageTypes.MyApproval)
+            {
+                <div class="col-md-6">
+                    <h6 class="font-charter_18">My Approvals</h6>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb bg_grey pl-0 pb-2 pt-0">
+                            @if (ViewBag.isFromDashboard)
+                            {
+                                <li class="breadcrumb-item fnt14"><a href="Dashboard" class="bcm_h">Dashboard</a></li>
+                                <li class="breadcrumb-item fnt14 active" aria-current="page">My Approvals</li>
+                            }
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-md-6 text-right pt-0-sm pt-0-xs mb-30-xs t_l_xs w_ip_50 w_ipp_50">
+                    <button type="submit" class="btn btn-warning prime_btn">
+                        <span _ngcontent-fim-c158=""><i aria-hidden="true" class="icon-Export"></i> Export</span>
+                    </button>
+                </div>
+            }
+            else if (ViewBag.PageType == UserPWC.Utilities.PageTypes.DisposalRequest)
+            {
+                <div class="col-md-6">
+                    <h6 class="font-charter_18 pt-3 pb-4">Disposal Requests</h6>
+                </div>
+            }
+            else if (ViewBag.PageType == UserPWC.Utilities.PageTypes.VendorSubmission)
+            {
+                <div class="col-md-6">
+                    <h6 class="font-charter_18 pt-3 pb-4">Vendor Submission</h6>
+                </div>
+                <div class="col-md-6 text-right pt-0-sm pt-0-xs mb-30-xs t_l_xs w_ip_50 w_ipp_50">
+                    <button type="submit" class="btn btn-warning prime_btn">
+                        <span _ngcontent-fim-c158=""><i aria-hidden="true" class="icon-Export"></i> Export</span>
+                    </button>
+                </div>
+            }
+            else if (ViewBag.PageType == UserPWC.Utilities.PageTypes.MyRequest)
+            {
+                <div class="col-md-6">
+                    <h6 class="font-charter_18">My Requests</h6>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb bg_grey pl-0 pb-2 pt-0">
+                            @if (ViewBag.isFromDashboard)
+                            {
+                                <li class="breadcrumb-item fnt14"><a href="Dashboard" class="bcm_h">Dashboard</a></li>
+                                <li class="breadcrumb-item fnt14 active" aria-current="page">My Requests</li>
+                            }
+                        </ol>
+                    </nav>
+                </div>
+            }
+            else if (ViewBag.PageType == UserPWC.Utilities.PageTypes.ManageRequest)
+            {
+                <div class="col-md-6">
+                    <h6 class="font-charter_18 pt-3 pb-4">Manage Requests</h6>
+                </div>
+                <div class="col-md-6 text-right pt-0-sm pt-0-xs mb-30-xs t_l_xs w_ip_50 w_ipp_50">
+                    <button type="submit" class="btn btn-warning prime_btn">
+                        <span _ngcontent-fim-c158=""><i aria-hidden="true" class="icon-Export"></i> Export</span>
+                    </button>
+                </div>
+            }
+            @if (ViewBag.PageType == 1 && !ViewBag.isFromDashboard)
+            {
+                <div class="col-md-6 text-right pt-0-sm pt-0-xs mb-30-xs t_l_xs w_ip_50 w_ipp_50">
+                    <a href="@Url.Action("CreateRequest", "Request",new { Pagetype = ViewBag.PageType})" class="btn btn-warning prime_btn font-weight-normal" onclick="getdata()"><span class="icon-add_icon"></span> New Archival Request</a>
+                    <a href="@Url.Action("BulkUpload", "Request")" class="btn btn-warning prime_btn font-weight-normal"><span class="icon-add_icon"></span> Bulk Upload </a>
+                    <button type="submit" class="btn btn-warning prime_btn">
+                        <span _ngcontent-fim-c158=""><i aria-hidden="true" class="icon-Export"></i> Export</span>
+                    </button>
+                </div>
+            }
+            @if (ViewBag.PageType == 1 && ViewBag.isFromDashboard)
+            {
+                <div class="col-md-6 text-right pt-2 pt-0-sm pt-0-xs mb-30-sm mb-30-xs">
+                    <a href="@Url.Action("CreateRequest", "Request",new { Pagetype = ViewBag.PageType})" class="btn btn-warning prime_btn font-weight-normal" onclick="getdata()"><span class="icon-add_icon"></span> New Archival Request</a>
+                    <a href="@Url.Action("BulkUpload", "Request")" class="btn btn-warning prime_btn font-weight-normal"><span class="icon-add_icon"></span> Bulk Upload </a>
+                    <button type="submit" class="btn btn-warning prime_btn">
+                        <span _ngcontent-fim-c158=""><i aria-hidden="true" class="icon-Export"></i> Export</span>
+                    </button>
+                </div>
+
+            }
+            @*@if (ViewBag.PageType == PwC.MediaDB.Core.Utilities.PageTypes.MyApproval &&
+                (userRoleID != PwC.MediaDB.Core.Utilities.UserRoles.OGC_Risk_Team && userRoleID != PwC.MediaDB.Core.Utilities.UserRoles.R_Q_RM) ||
+                  (ViewBag.PageType == PwC.MediaDB.Core.Utilities.PageTypes.ManageRequest &&
+                   userRoleID != PwC.MediaDB.Core.Utilities.UserRoles.FileCoordinator))
+                 {
+                     <div class="col-md-6 text-right pt-0-sm pt-0-xs mb-30-xs t_l_xs w_ip_50 w_ipp_50"><a href="@Url.Action("SwitchLegalHoldIndex", "Request",new { Pagetype = ViewBag.PageType})" class="btn btn-warning prime_btn font-weight-normal"><span></span> Switch Legal Hold</a> </div>
+
+                 }
+                 else if (ViewBag.PageType == PwC.MediaDB.Core.Utilities.PageTypes.MyApproval &&
+                     ((userRoleID == PwC.MediaDB.Core.Utilities.UserRoles.OGC_Risk_Team && Designation == PwC.MediaDB.Core.Utilities.UserRoles.Manager) ||
+                          (userRoleID == PwC.MediaDB.Core.Utilities.UserRoles.OGC_Risk_Team && Designation == PwC.MediaDB.Core.Utilities.UserRoles.Partner) ||
+                          (userRoleID == PwC.MediaDB.Core.Utilities.UserRoles.R_Q_RM && Designation == PwC.MediaDB.Core.Utilities.UserRoles.Manager) ||
+                          (userRoleID == PwC.MediaDB.Core.Utilities.UserRoles.R_Q_RM && Designation == PwC.MediaDB.Core.Utilities.UserRoles.Partner)))
+                 {
+                     <div class="col-md-6 text-right pt-0-sm pt-0-xs mb-30-xs t_l_xs w_ip_50 w_ipp_50"><a href="@Url.Action("SwitchLegalHoldIndex", "Request",new { Pagetype = ViewBag.PageType})" class="btn btn-warning prime_btn font-weight-normal"><span></span> Switch Legal Hold</a> </div>
+                 }*@
+        </div>
+    </div>
+    <div class="row m_auto px-4 mt_n19">
+        <div class="col-12 sha_dow p-0 over_auto bg_white mb-3">
+            <div class="col-12 p-0">
+                <div class="float-right d-flex edit_icon_cl font-neue_24 pt-3 pr-3 filter-collapse" style="position: relative; right: 0">
+                    <span class="icon-filter_icon fnt24 pr-1 font-weight600"></span>
+                    <div class="text-line pt-1 cursor" data-toggle="collapse" href="#filter-1">Filter</div>
+                </div>
+                <div class="float-right d-flex fnt14 pt-3 pr-3 mt-2">
+                    <input type="checkbox" id="governmentClientCheckBox" name="governmentClientCheckBox" onchange="GovernmentClientFilter()" /> <span> &nbsp; Government Client</span>
+                </div>
+                @if (ViewBag.PageType == UserPWC.Utilities.PageTypes.MyApproval || ViewBag.PageType == UserPWC.Utilities.PageTypes.VendorSubmission || ViewBag.PageType == UserPWC.Utilities.PageTypes.ManageRequest || ViewBag.PageType == UserPWC.Utilities.PageTypes.DisposalRequest)
+                {
+                    <div class="pl-3 pb-2 pt-3 font-neue_24" style="font-family: Charter ITC Regular;visibility:hidden">
+                        Approvals List
+                    </div>
+                }
+                else if (ViewBag.PageType == UserPWC.Utilities.PageTypes.MyRequest)
+                {
+                    <ul class="nav nav-pills" id="pills-tab" role="tablist">
+                        <li class="nav-item filter-item" id="1"> <a class="nav-link tab-pad title-font-charter_21 active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="false" onclick="GovernmentClientFilter()">Requests List</a> </li>
+                        <li class="nav-item filter-item" id="2"> <a class="nav-link tab-pad title-font-charter_21" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="true" onclick="loadRetentionData(1)">Retention Completed Requests</a> </li>
+                        <li class="nav-item filter-item" id="3"> <a class="nav-link tab-pad title-font-charter_21" id="pills-Historical-tab" data-toggle="pill" href="#pills-Historical" role="tab" aria-controls="pills-Historical" aria-selected="true" onclick="loadOwnersHistoricalData(1)">Historical Requests</a> </li>
+                    </ul>
+                }
+                <div class="col-md-3" style="display:none">
+                    <div class="form-group pwc_form col-md-12 mt-2">
+                        <input type="text" class="form-control" id="pageType" name="pageType" value="@ViewBag.PageType">
+                        <input type="text" class="form-control" id="IsRetention" name="IsRetention">
+                    </div>
+                </div>
+
+                <div class="tab-content" id="pills-tabContent">
+                    <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                        <div class="over_auto" data-simplebar style="overflow-y: hidden !important; overflow-x: hidden !important;">
+                            <div class="collapse" id="filter-1">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="custom_color-1 white_cl p-2">Filter</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="form-group pwc_form col-md-12 mt-2">
+                                                    <label for="inputState">Request ID</label>
+                                                    <input type="text" class="form-control" id="fltrRequestId" name="fltrRequestId" placeholder="F01" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group pwc_form col-md-12 mt-2">
+                                                    <label for="inputState">Barcode</label>
+                                                    <input type="text" class="form-control" id="fltrBarCode" name="fltrBarCode" placeholder="Barcode">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group pwc_form col-md-12 mt-2">
+                                                    <label for="inputState">Container code</label>
+                                                    <input type="text" class="form-control" id="fltrContainer" name="fltrContainer" placeholder="Container code">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group pwc_form col-md-12 mt-2">
+                                                    <label for="inputState">File Code</label>
+                                                    <input type="text" class="form-control" id="fltrFile" name="fltrFile" placeholder="File Code">
+                                                </div>
+                                            </div>
+                                            @if (userRoleID != UserPWC.Utilities.UserRoles.Partner)
+                                            {
+                                                <div class="col-md-3">
+                                                    <div class="form-group pwc_form col-md-12 mt-2">
+                                                        <label for="inputState">Engagement Partner</label>
+                                                        <input type="text" class="form-control" id="EngPartner" name="EngPartner" placeholder="Search Engagement Partner" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                                        <input type="text" id="fltrEngPartner" style="display:none">
+                                                    </div>
+                                                </div>
+                                            }
+                                            @if (userRoleID != UserPWC.Utilities.UserRoles.Manager)
+                                            {
+                                                <div class="col-md-3">
+                                                    <div class="form-group pwc_form col-md-12 mt-2">
+                                                        <label for="inputState">Engagement Manager</label>
+                                                        <input type="text" class="form-control" id="EngManager" name="EngManager" placeholder="Search Engagement Manager" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                                        <input type="text" id="fltrEngManager" style="display:none">
+                                                    </div>
+                                                </div>
+                                            }
+                                            <div class="col-md-3">
+                                                <div class="form-group pwc_form col-md-12 mt-2">
+                                                    <label for="inputState">Location</label>
+                                                    <input type="text" class="form-control" id="fltrLocation" name="fltrLocation" placeholder="Location">
+                                                </div>
+                                            </div>
+                                            @if ((userRoleID == UserPWC.Utilities.UserRoles.Admin || isSuperAdmin == "Yes") && ViewBag.PageType != UserPWC.Utilities.PageTypes.MyApproval)
+                                            {
+                                                <div class="col-md-3">
+                                                    <div class="form-group pwc_form col-md-12 mt-2">
+                                                        <label for="inputState">LOS</label>
+                                                        <input type="text" class="form-control" id="Los" name="Los" placeholder="Search LOS" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                                        <input type="text" id="fltrLos" style="display:none">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-group pwc_form col-md-12 mt-2">
+                                                        <label for="inputState">SBU</label>
+                                                        <input type="text" class="form-control" id="sbu" name="sbu" placeholder="Search SBU" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                                        <input type="text" id="fltrSbu" style="display:none">
+                                                    </div>
+                                                </div>
+                                            }
+                                            <div class="col-md-3">
+                                                <div class="form-group pwc_form col-md-12 mt-2">
+                                                    <label for="inputState">Project Code</label>
+                                                    <input type="text" class="form-control" id="fltrProject" name="fltrProject" placeholder="Project Code">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group pwc_form col-md-12 mt-2">
+                                                    <label for="inputState">Status</label>
+                                                    <select id="fltrStatus" name="fltrStatus" class="form-control pwc_dropdown_ctrl special">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group pwc_form col-md-12 mt-2">
+                                                    <label for="inputState">File Type</label>
+                                                    <select id="fltrFileType" name="fltrFileType" class="form-control pwc_dropdown_ctrl">
+                                                        <option value="undefined">Select File Type</option>
+                                                        <option value="1">@UserPWC.Utilities.FileTypeName.Legal</option>
+                                                        <option value="0">@UserPWC.Utilities.FileTypeName.NonLegal</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group pwc_form col-md-12 mt-2">
+                                                    <label for="inputState">Request Type</label>
+                                                    <select id="fltrReqType" name="fltrReqType" class="form-control pwc_dropdown_ctrl special">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group pwc_form col-md-12 mt-2">
+                                                    <label for="inputState">Client Name</label>
+                                                    <input type="text" class="form-control" id="fltrclient" name="fltrclient" placeholder="Client Name" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="form-group pwc_form col-md-12 mt-2">
+                                                    <label for="inputState">Contracting Firm</label>
+                                                    <input type="text" class="form-control" id="fltrentity" name="fltrentity" placeholder="Contracting Firm" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="float-right mr-3 mb-3">
+                                            <button type="button" class="btn btn-secondary mr-2 second_btn font-weight-bold" onclick="clearTextBox()">Cancel</button>
+                                            <button type="button" class="btn btn-primary prime_btn px-4 font-weight-bold" onclick="FilterRequestList()">Submit</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row m_auto">
+                                <div class="over_auto mt-3 col-md-@colSize1 p-0 w_f_100_ipad" data-simplebar>
+                                    <table class="table table-striped ellipseText mb-0 bor_l_b">
+                                        <thead>
+                                            <tr class="head_tr">
+                                                @if (ViewBag.PageType == UserPWC.Utilities.PageTypes.MyApproval || ViewBag.PageType == UserPWC.Utilities.PageTypes.ManageRequest || ViewBag.PageType == UserPWC.Utilities.PageTypes.DisposalRequest)
+                                                {
+                                                    <th class="pl-3 fnt14" scope="col"><input type="checkbox" id="select_all" disabled /></th>
+                                                }
+                                                <th class="pl-3 fnt14" scope="col">S.No</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('requestId')">Request ID</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('createdDate')">Created Date</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('createdBy')">Created By</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('engManager')">Engagement Manager</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('engPartner')">Engagement Partner</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('clientName')">Client Name</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('entityName')">Contracting Firm</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('requestType')">Request Type</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('approver')">Approver Name</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('designation')">Approver Designation</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('lastApproval')">Last Request Approval</th>
+                                            </tr>
+                                            <tr>
+                                                @if (ViewBag.PageType == UserPWC.Utilities.PageTypes.MyApproval || ViewBag.PageType == UserPWC.Utilities.PageTypes.ManageRequest || ViewBag.PageType == UserPWC.Utilities.PageTypes.DisposalRequest)
+                                                {
+                                                    <td><input type="name" class="form-control search_form pl-1 fnt14" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="S.No" style="display:none"></td>
+                                                }
+                                                <td><input type="name" class="form-control search_form pl-1 fnt14" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="S.No" style="display:none"></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="requestId" aria-describedby="emailHelp" placeholder="Request ID" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="createdDate" aria-describedby="emailHelp" placeholder="Created Date" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="createdBy" aria-describedby="emailHelp" placeholder="Created By" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="engagementManager" aria-describedby="emailHelp" placeholder="Engagement Manager" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="engagementPartner" aria-describedby="emailHelp" placeholder="Engagement Partner" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="clientName" aria-describedby="emailHelp" placeholder="Client Name" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="entityName" aria-describedby="emailHelp" placeholder="Contracting Firm" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="requestType" aria-describedby="emailHelp" placeholder="Request Type" value="@ViewBag.RequestType" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="approverName" aria-describedby="emailHelp" placeholder="Approver Name" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="approverDesignation" aria-describedby="emailHelp" placeholder="Approver Designation"></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="lastRequestApproval" aria-describedby="emailHelp" placeholder="Last Request Approval"></td>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="tbody" id="Request_Table"></tbody>
+                                    </table>
+                                </div>
+                                <div class="over_auto mt-3 col-md-@colSize2 p-0 w_f_100_ipad" data-simplebar>
+                                    <table class="table table-striped ellipseText mb-0 bor_l_b" style="width:100% !important">
+                                        <thead>
+                                            <tr class="head_tr">
+                                                <th class="fnt14" scope="col" onclick="sortTable('fileType')">File Type</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('status')">Status</th>
+                                                <th class="fnt14" scope="col">Approver History</th>
+                                                <th class="fnt14" scope="col">Audit History</th>
+                                                @if ((ViewBag.PageType != UserPWC.Utilities.PageTypes.MyApproval || (ViewBag.PageType == UserPWC.Utilities.PageTypes.MyApproval && (Designation == 2 || Designation == 3)))
+                                                && ViewBag.PageType != UserPWC.Utilities.PageTypes.VendorSubmission &&
+                                                (ViewBag.PageType !=UserPWC.Utilities.PageTypes.ManageRequest || (ViewBag.PageType == UserPWC.Utilities.PageTypes.ManageRequest &&
+                                                  (userRoleID ==UserPWC.Utilities.UserRoles.Admin || /*userRoleID == PwC.MediaDB.Core.Utilities.UserRoles.Auditor ||*/ isSuperAdmin == "Yes"))) &&
+                                                ViewBag.PageType != UserPWC.Utilities.PageTypes.DisposalRequest)
+                                                {
+                                                    <th class="fnt14 text-center" style="background-color:#DEDEDE !important" scope="col">Action</th>
+                                                }
+                                            </tr>
+                                            <tr>
+                                                <td><input type="name" class="form-control search_form fnt14" id="fileType" aria-describedby="emailHelp" placeholder="File Type" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="status" aria-describedby="emailHelp" placeholder="Status" value="@ViewBag.status" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="approvalHistory" aria-describedby="emailHelp" placeholder="" style="display:none"></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="auditHistory" aria-describedby="emailHelp" placeholder="" style="display:none"></td>
+                                                @if ((ViewBag.PageType != UserPWC.Utilities.PageTypes.MyApproval || (ViewBag.PageType == UserPWC.Utilities.PageTypes.MyApproval && (Designation == 2 || Designation == 3)))
+                                               && ViewBag.PageType != UserPWC.Utilities.PageTypes.VendorSubmission &&
+                                              (ViewBag.PageType !=UserPWC.Utilities.PageTypes.ManageRequest || (ViewBag.PageType == UserPWC.Utilities.PageTypes.ManageRequest &&
+                                                 (userRoleID == UserPWC.Utilities.UserRoles.Admin ||/* userRoleID == PwC.MediaDB.Core.Utilities.UserRoles.Auditor || */isSuperAdmin == "Yes"))) &&
+                                               ViewBag.PageType != UserPWC.Utilities.PageTypes.DisposalRequest)
+                                                {
+                                                    <td><input type="name" class="form-control search_form fnt14" id="action" aria-describedby="emailHelp" placeholder="" style="display:none"></td>
+                                                }
+                                            </tr>
+                                        </thead>
+                                        <tbody class="tbody" id="Request_Table_Static_Data">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row m-auto">
+                            <div class="col-md-6 mt-2">
+                                @*<div class="col-12 mt-0-sm fnt14 mt-3 pl-3 pb-11" style="display:flex; justify-content:flex-start"><span class="status-indication"></span> &nbsp; Government Client Highlighted</div>*@
+                            </div>
+                            <div class="col-md-6 mt-3">
+                                <nav aria-label="Page navigation example" class="pagination_page">
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+                        <div class="over_auto" data-simplebar style="overflow-y: hidden !important; overflow-x: hidden !important;">
+                            <div class="collapse" id="filter-2">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="custom_color-1 grey-bg  font-weight-bold p-2 pt-2">Filter</div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="form-group pwc_form col-md-12 mt-2">
+                                                    <label for="inputState">Retention Period Completion (in years)</label>
+                                                    <input type="number" class="form-control" id="R_CompleteYear" name="R_CompleteYear" value=8 min=8>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group pwc_form col-md-12 mt-2">
+                                                    <label for="inputState">Retention Period Completed Date</label>
+                                                    <div class="input-group mb-3 ">
+                                                        <input type="date" class="form-control" id="R_Complete_Date" name="R_Complete_Date" placeholder="Retention Period Completed Date" onclick="SetDate()">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="float-right mr-3 mb-3">
+                                            <button type="button" class="btn btn-secondary mr-2 second_btn font-weight-bold" onclick="Reset()">Reset</button>
+                                            <button type="button" class="btn btn-primary prime_btn px-4 font-weight-bold" onclick="loadRetentionData(1)">Submit</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row m_auto">
+                                <div class="over_auto mt-3 col-md-9 p-0 w_f_100_ipad" data-simplebar>
+                                    <table class="table table-striped ellipseText mb-0 bor_l_b">
+                                        <thead>
+                                            <tr class="head_tr">
+                                                <th class="pl-3 fnt14" scope="col"><input type="checkbox" id="R_select_all" /></th>
+                                                <th class="pl-3 fnt14" scope="col">S.No</th>
+                                                <th class="fnt14" scope="col" onclick="retentionSortTable('requestId')">Request ID</th>
+                                                <th class="fnt14" scope="col" onclick="retentionSortTable('createdBy')">Created By</th>
+                                                <th class="fnt14" scope="col" onclick="retentionSortTable('startDate')">Start Date</th>
+                                                <th class="fnt14" scope="col" onclick="retentionSortTable('retentionYear')">Retention (In years)</th>
+                                                <th class="fnt14" scope="col" onclick="retentionSortTable('retentionCompletedDate')">Retention Completed Date</th>
+                                                <th class="fnt14" scope="col" onclick="retentionSortTable('clientName')">Client Name</th>
+                                                <th class="fnt14" scope="col" onclick="retentionSortTable('engManager')">Engagement Manager</th>
+                                                <th class="fnt14" scope="col" onclick="retentionSortTable('engPartner')">Engagement Partner</th>
+                                                <th class="fnt14" scope="col" onclick="retentionSortTable('requestType')">Request Type</th>
+                                                <th class="fnt14" scope="col" onclick="retentionSortTable('approver')">Approver Name</th>
+                                                <th class="fnt14" scope="col" onclick="retentionSortTable('designation')">Approver Designation</th>
+                                                <th class="fnt14" scope="col" onclick="retentionSortTable('lastApproval')">Last Request Approval</th>
+                                            </tr>
+                                            <tr>
+                                                <td><input type="name" class="form-control search_form pl-1 fnt14" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="S.No" style="display:none"></td>
+                                                <td><input type="name" class="form-control search_form pl-1 fnt14" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="S.No" style="display:none"></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="R_RequestIdSearch" aria-describedby="emailHelp" placeholder="Request ID" oninput=RetentionSearch()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="R_CreatedBySearch" aria-describedby="emailHelp" placeholder="Created By" oninput=RetentionSearch()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="R_StartDateSearch" aria-describedby="emailHelp" placeholder="Start Date" oninput=RetentionSearch()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="R_YrSearch" aria-describedby="emailHelp" placeholder="Retention (In years)" oninput=RetentionSearch()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="R_CompletedDateSearch" aria-describedby="emailHelp" placeholder="Retention Completed Date" oninput=RetentionSearch()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="clientName" aria-describedby="emailHelp" placeholder="Client Name" oninput=RetentionSearch()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="R_EngManagerSearch" aria-describedby="emailHelp" placeholder="Engagement Manager" oninput=RetentionSearch()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="R_EngPartnerSearch" aria-describedby="emailHelp" placeholder="Engagement Partner" oninput=RetentionSearch()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="R_RequestTypeSearch" aria-describedby="emailHelp" placeholder="Request Type" oninput=RetentionSearch()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="R_ApprNameSearch" aria-describedby="emailHelp" placeholder="Approver Name" oninput=RetentionSearch()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="R_ApprDesigSearch" aria-describedby="emailHelp" placeholder="Approver Designation"></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="R_LastApprSearch" aria-describedby="emailHelp" placeholder="Last Request Approval"></td>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="Retention_tbody"></tbody>
+                                    </table>
+                                </div>
+                                <div class="over_auto mt-3 col-md-3 p-0 w_f_100_ipad" data-simplebar>
+                                    <table class="table table-striped ellipseText mb-0 bor_l_b" style="width:100% !important">
+                                        <thead>
+                                            <tr class="head_tr">
+                                                <th class="fnt14" scope="col" onclick="retentionSortTable('fileType')">File Type</th>
+                                                <th class="fnt14" scope="col" onclick="retentionSortTable('status')">Status</th>
+                                                <th class="fnt14 text-center" style="background-color:#DEDEDE !important" scope="col">Action</th>
+                                            </tr>
+                                            <tr>
+                                                <td><input type="name" class="form-control search_form fnt14" id="R_FileTypeSearch" aria-describedby="emailHelp" placeholder="File Type" oninput=RetentionSearch()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="R_StatusSearch" aria-describedby="emailHelp" placeholder="Status" value="@ViewBag.status" oninput=RetentionSearch()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="action" aria-describedby="emailHelp" placeholder="" style="display:none"></td>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="tbody" id="Retention_Table_Static_Data">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-auto">
+                            <div class="col-md-6 mt-2">
+                                @*<div class="col-12 mt-0-sm fnt14 mt-3 pl-3 pb-11" style="display:flex; justify-content:flex-start"><span class="status-indication"></span> &nbsp; Government Client Highlighted</div>*@
+                            </div>
+                            <div class="col-md-6 mt-3">
+                                <nav aria-label="Page navigation example" class="R_pagination_page">
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="pills-Historical" role="tabpanel" aria-labelledby="pills-Historical-tab">
+                        <div class="over_auto" data-simplebar style="overflow-y: hidden !important; overflow-x: hidden !important;">
+                            <div class="collapse" id="filter-3">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="custom_color-1 white_cl p-2">Filter</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="form-group pwc_form col-md-12 mt-2">
+                                                    <label for="fltrLos">LOS</label>
+                                                    <input type="text" class="form-control" id="fltrLos" name="fltrLos" placeholder="Search LOS" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group pwc_form col-md-12 mt-2">
+                                                    <label for="fltrSbu">SBU</label>
+                                                    <input type="text" class="form-control" id="fltrSbu" name="fltrSbu" placeholder="Search SBU" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group pwc_form col-md-12 mt-2">
+                                                    <label for="fltrdepart">Department</label>
+                                                    <input type="text" class="form-control" id="fltrdepart" name="fltrdepart" placeholder="Department" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group pwc_form col-md-12 mt-2">
+                                                    <label for="fltrBranch">Branch</label>
+                                                    <input type="text" class="form-control" id="fltrBranch" name="fltrBranch" placeholder="Branch" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group pwc_form col-md-12 mt-2">
+                                                    <label for="fltrContainerCode">Container Code</label>
+                                                    <input type="text" class="form-control" id="fltrContainerCode" name="fltrContainerCode" placeholder="Container Code" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group pwc_form col-md-12 mt-2">
+                                                    <label for="inputState">Item Status</label>
+                                                    <select id="fltrItem_Status" class="form-control pwc_dropdown_ctrl" name="fltrItem_Status">
+                                                        <option value="undefined">All</option>
+                                                        <option value="In">In</option>
+                                                        <option value="Out">Out</option>
+                                                        <option value="Out Permenant">Out Permenant</option>
+                                                        <option value="Destroyed">Destroyed</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group pwc_form col-md-12 mt-2">
+                                                    <label for="inputState">Historical Status</label>
+                                                    <select id="fltrHistorical_Status" class="form-control pwc_dropdown_ctrl" name="fltrHistorical_Status">
+                                                        <option value="undefined">All</option>
+                                                        <option value="Pending">Pending</option>
+                                                        <option value="Assigned">Assigned</option>
+                                                        <option value="Completed">Completed</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="float-right mr-3 mb-3">
+                                            <button type="button" class="btn btn-secondary mr-2 second_btn font-weight-bold" onclick="clearTextBox()">Cancel</button>
+                                            <button type="button" class="btn btn-primary prime_btn px-4 font-weight-bold" onclick="Filter()">Submit</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row m_auto">
+                                <div class="over_auto mt-3 col-md-8 p-0 w_f_100_ipad" data-simplebar>
+                                    <table class="table table-striped ellipseText mb-0 bor_l_b">
+                                        <thead>
+                                            <tr class="head_tr">
+
+                                                <th class="pl-3 fnt14" scope="col">S.No</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('HistoricalId')">Historical ID</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('ArchivalLocation')">Archival Location</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('Vendor')">Vendor</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('Container_Code')">Container Code</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('Code')">Code</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('LOS')">LOS</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('SBU')">SBU</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('AddDate')">Add Date</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('FromDate')">From Date</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('ToDate')">To Date</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('StatusDate')">Status Date</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('Department')">Department</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('Description')">Description</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('AccountCode')">Account Code</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('AccountDescription')">Account Description</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('Branch')">Branch</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('Field_17')">Field_17</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('Field_18')">Field_18</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('Field_19')">Field_19</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('Field_19')">Field_20</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('Field_21')">Field_21</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('Field_22')">Field_22</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('Field_23')">Field_23</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('Field_24')">Field_24</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('Field_25')">Field_25</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('Field_26')">Field_26</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('Field_27')">Field_27</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('Field_28')">Field_28</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('Field_29')">Field_29</th>
+                                                @* <th class="fnt14" scope="col" onclick="sortTable('Comments')">Comments</th>*@
+                                            </tr>
+                                            <tr>
+
+                                                <td><input type="name" class="form-control search_form pl-1 fnt14" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="S.No" style="display:none"></td>
+                                                <td><input type="name" class="form-control search_form pl-1 fnt14" id="search_Historical_ID" aria-describedby="emailHelp" placeholder="Historical ID" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Archival_Location" aria-describedby="emailHelp" placeholder="Archival_Location" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Vendor" aria-describedby="emailHelp" placeholder="Vendor" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Container_Code" aria-describedby="emailHelp" placeholder="Container Code" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Code" aria-describedby="emailHelp" placeholder="Code" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_LOS" aria-describedby="emailHelp" placeholder="LOS" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_SBU" aria-describedby="emailHelp" placeholder="SBU" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Add_Date" aria-describedby="emailHelp" placeholder="Add Date" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_From_Date" aria-describedby="emailHelp" placeholder="From Date" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_To_Date" aria-describedby="emailHelp" placeholder="To Date" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Status_Date" aria-describedby="emailHelp" placeholder="Status Date" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Department" aria-describedby="emailHelp" placeholder="Department" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Description" aria-describedby="emailHelp" placeholder="Description" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Account_Code" aria-describedby="emailHelp" placeholder="Account Code" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Account_Description" aria-describedby="emailHelp" placeholder="Account Description" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Branch" aria-describedby="emailHelp" placeholder="Branch" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Field_17" aria-describedby="emailHelp" placeholder="Field 17" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Field_18" aria-describedby="emailHelp" placeholder="Field 18" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Field_19" aria-describedby="emailHelp" placeholder="Field 19" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Field_20" aria-describedby="emailHelp" placeholder="Field 20" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Field_21" aria-describedby="emailHelp" placeholder="Field 21" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Field_22" aria-describedby="emailHelp" placeholder="Field 22" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Field_23" aria-describedby="emailHelp" placeholder="Field 23" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Field_24" aria-describedby="emailHelp" placeholder="Field 24" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Field_25" aria-describedby="emailHelp" placeholder="Field 25" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Field_26" aria-describedby="emailHelp" placeholder="Field 26" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Field_27" aria-describedby="emailHelp" placeholder="Field 27" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Field_28" aria-describedby="emailHelp" placeholder="Field 28" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Field_29" aria-describedby="emailHelp" placeholder="Field 29" oninput=Search()></td>
+                                                @*<td><input type="name" class="form-control search_form fnt14" id="search_Comments" aria-describedby="emailHelp" placeholder="Comments" oninput=Search()></td>*@
+                                            </tr>
+                                        </thead>
+                                        <tbody class="tbody" id="Request_Table"></tbody>
+                                    </table>
+                                </div>
+                                <div class="over_auto mt-3 col-md-4 p-0 w_f_100_ipad" data-simplebar>
+                                    <table class="table table-striped ellipseText mb-0 bor_l_b" style="width:100% !important">
+                                        <thead>
+                                            <tr class="head_tr">
+                                                <th class="fnt14" scope="col" onclick="sortTable('ItemStatus')">Item Status</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('HistoricalStatus')">Historical Status</th>
+                                                <th class="fnt14" scope="col" onclick="sortTable('RequestID')">Request ID</th>
+                                                @*<th class="fnt14" scope="col">Action</th>*@
+                                            </tr>
+                                            <tr>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Item_Status" aria-describedby="emailHelp" placeholder="Item Status" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Historical_Status" aria-describedby="emailHelp" placeholder="Historical Status" oninput=Search()></td>
+                                                <td><input type="name" class="form-control search_form fnt14" id="search_Request_ID" aria-describedby="emailHelp" placeholder="Request ID" oninput=Search()></td>
+                                                @*<td><input type="name" class="form-control search_form fnt14" id="search_Action" aria-describedby="emailHelp" placeholder="Action" style="display:none"></td>*@
+                                            </tr>
+                                        </thead>
+                                        <tbody class="tbody" id="Historical_Table_Static_Data">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-auto">
+                            <div class="col-md-6 mt-2">
+                                @*<div class="col-12 mt-0-sm fnt14 mt-3 pl-3 pb-11" style="display:flex; justify-content:flex-start"><span class="status-indication"></span> &nbsp; Government Client Highlighted</div>*@
+                            </div>
+                            <div class="col-md-6 mt-3">
+                                <nav aria-label="Page navigation example" class="Historical_pagination_page">
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*</div>*@
+    @if (ViewBag.PageType == UserPWC.Utilities.PageTypes.MyRequest)
+    {
+        <div class="foot_h"></div>
+        <div class="footer p-0 my_footer" id="dispose_Footer" style="display:none">
+            <div class="container-fluid bg_white bor_l_t">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary prime_btn px-4 font-weight-normal" id="disposebtn" onclick="DisposePopClear(1)" style="background-color: #D04A02" disabled>Request to Dispose</button>
+                </div>
+            </div>
+        </div>
+    }
+    @if (ViewBag.PageType == UserPWC.Utilities.PageTypes.MyApproval || ViewBag.PageType == UserPWC.Utilities.PageTypes.ManageRequest || ViewBag.PageType ==UserPWC.Utilities.PageTypes.DisposalRequest)
+    {
+        @if (ViewBag.PageType == UserPWC.Utilities.PageTypes.ManageRequest && ViewBag.userRole == UserPWC.Utilities.UserRoles.FileCoordinator)
+        {
+            <div class="foot_h"></div>
+            <div class="footer p-0 my_footer">
+                <div class="container-fluid bg_white bor_l_t">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary prime_btn px-4 font-weight-normal" id="approvebtn" style="background-color: #D04A02; display:none" onclick="ShowModalComment(8,1)">Submit</button>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="foot_h"></div>
+            <div class="footer p-0 my_footer">
+                <div class="container-fluid bg_white bor_l_t">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary prime_btn px-4 font-weight-normal" id="holdbtn" style="background-color: #933401; display:none" onclick="ShowModalComment(4)">OnHold</button>
+                        <button type="button" class="btn btn-primary prime_btn px-4 font-weight-normal" id="rejectbtn" style="background-color: #D04A02; display:none" onclick="ShowModalComment(9)">Reject</button>
+                        <button type="button" class="btn btn-primary prime_btn px-4 font-weight-normal" id="approvebtn" style="background-color: #4EB523; display:none" onclick="ShowModalComment(8)">Approve</button>
+                        <button type="button" data-toggle="modal" data-target="#disposePopup" class="btn btn-primary prime_btn px-4 font-weight-normal" id="disposebtn" style="background-color: #D04A02; display: none;" onclick="GetFileCoordinator()">Request to Dispose</button>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</form>
+
+<input type="text" id="filterLOSCode" value="@ViewBag.FltrLOS" style="display:none">
+<input type="text" id="filterSBUCode" value="@ViewBag.FltrSBU" style="display:none">
+<input type="text" id="filterStatusID" value="@ViewBag.FltrStatusID" style="display:none">
+
+<!--Action Pop Up-->
+<div class="modal fade" id="addCommentsHold" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <p class="addcomments" style="width:100%;"></p>
+    </div>
+</div>
+
+<!--Approve Pop Up with-->
+<div class="modal fade" id="approvePopup" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header grey-bg modal-header-pad">
+                <h5 class="modal-title" id="modelTitle">  Approve Request  </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-3 col-lg-3">
+                        <div class="form-group pwc_form col-md-12 mt-2">
+                            <label for="inputname" class="d-flex">File Type</label>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" class="custom-control-input" id="customRadio7" name="editLegalHold" value="customEx" checked="checked">
+                                <label class="custom-control-label mt-1" for="customRadio7">@UserPWC.Utilities.FileTypeName.Legal</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" class="custom-control-input" id="customRadio8" name="editLegalHold" value="customEx">
+                                <label class="custom-control-label mt-1" for="customRadio8">@UserPWC.Utilities.FileTypeName.NonLegal</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group pwc_form col-md-12 mt-2">
+                            <label for="inputState" id="Edit_Retention_Period_Label">Retention Period Completion (in years)</label>
+                            <input type="number" class="form-control" id="Edit_Retention_Period" disabled required>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="Legal_Hold_Section" style="display:none">
+                    <div class="col-md-6">
+                        <div class="form-group pwc_form col-md-12 mt-2">
+                            <label for="inputState" id="Edit_File_Description_Label">File Description</label>
+                            <textarea class="form-control" id="Edit_File_Description" rows="2" placeholder="File Description of the Contents" required></textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-3 pt-1 w_ip_100" id="Edit_Has_Legal_File">
+                        <div class="form-group pwc_form col-md-12 mt-2">
+                            <p class="fnt14 mb-0">Upload File</p>
+                            <label class="btn btn-warning prime_btn mt-2" for="Editfile">Browse File</label>
+                            <input type="file" class="form-control-file" id="Editfile" multiple="multiple" onchange="previewEditFiles();" hidden />
+                            <p id="validEditFile_msg" style="color:red; display:none">Invalid File Format!</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 pt-1 w_ip_100" id="Edit_upload_File_tag" style="display:none">
+                        <div class="form-group pwc_form col-md-12 mt-2  upload-file" id="Edit_upload_files">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 col-lg-12">
+                        <div class="form-group pwc_form col-md-12 mt-2">
+                            <label>Add Comments</label>
+                            <textarea class="form-control" id="comment" rows="2" placeholder="Add Comments" required></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group pwc_form col-md-12 mt-2">
+                            <input type="checkbox" id="EditcheckboxId" onchange="ChangesChecked()" /><span> Save Changes to the exisiting request</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group pwc_form col-md-12 mt-2">
+                            <input type="checkbox" id="AckcheckboxId" onchange="Checked()" /><span> I have reviewed the Archival form and I approve archival of the files.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary second_btn" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary delete_btn" style="background-color:#4EB523" onclick="ApprovalUpdate(8)" id="btnDisable" Disabled> Approve Request </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Dispose Pop Up with-->
+<div class="modal fade" id="disposePopup" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header grey-bg modal-header-pad">
+                <h5 class="modal-title" id="modelTitle">  Dispose Request  </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group pwc_form col-md-12 mt-2">
+                            <label for="inputState" id="Edit_File_Description_Label">File Co-Ordinator</label>
+                            <input type="text" class="form-control" id="FileCoordinator" placeholder="File Co-ordinator" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 col-lg-12">
+                        <div class="form-group pwc_form col-md-12 mt-2">
+                            <label>Add Comments</label>
+                            <textarea class="form-control" id="comment" rows="2" placeholder="Add Comments" required></textarea>
+                        </div>
+                    </div>
+                </div>
+                @*<div class="row">
+                        <div class="col-12">
+                            <div class="form-group pwc_form col-md-12 mt-2">
+                                <input type="checkbox" id="EditcheckboxId" onchange="ChangesChecked()" /><span> Save Changes to the exisiting request</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group pwc_form col-md-12 mt-2">
+                                <input type="checkbox" id="AckcheckboxId" onchange="Checked()" /><span> I have reviewed the Archival form and I approve archival of the files.</span>
+                            </div>
+                        </div>
+                    </div>*@
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary second_btn" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary delete_btn" style="background-color: #D04A02" onclick="Dispose()" id="btnDisable"> Request to Dispose</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Action Success Popup-->
+<div class="modal fade" id="approvalSuccess" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <p class="SuccessModel" style="width:100%;"></p>
+    </div>
+</div>
+
+
+<!--Approver History Modal-->
+<div class="modal fade" id="approver_history" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog  modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title" id="ApproverHistoryModalTitle">Approver History</h4>
+                <h4 class="modal-title" id="ApproverHistoryRequester"></h4>
+                <h4 class="modal-title" id="ApproverHistoryRequesterDesignation"></h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="container" style="text-align:center">
+                    <div class="progress-bar" id="ApproverHistoryProgressBar">
+                        <div class="step">
+                            <p></p>
+                            <div class="bullet">
+                                <span class=" icon-top">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14.516" height="22" fill="currentColor" color="#8c8c8c" viewBox="0 0 14.516 22">
+                                        <g id="wait" transform="translate(-82.5)">
+                                            <path id="Path_17598" data-name="Path 17598" d="M93.943,8.144c1.511-1.232,3.073-2.506,3.073-4.855V0H82.5V3.289c0,2.35,1.562,3.623,3.073,4.855a12.9,12.9,0,0,1,2.061,1.948A1.935,1.935,0,0,1,87.8,11a1.935,1.935,0,0,1-.162.908,12.9,12.9,0,0,1-2.061,1.948c-1.511,1.232-3.073,2.506-3.073,4.855V22H97.015V18.711c0-2.35-1.562-3.623-3.073-4.855a12.9,12.9,0,0,1-2.061-1.948A1.935,1.935,0,0,1,91.719,11a1.935,1.935,0,0,1,.162-.908A12.9,12.9,0,0,1,93.943,8.144Zm-3.133,4.6a13.927,13.927,0,0,0,2.273,2.164c1.38,1.125,2.572,2.1,2.572,3.8v1.928H83.861V18.711c0-1.7,1.192-2.675,2.572-3.8a13.926,13.926,0,0,0,2.273-2.164,3.613,3.613,0,0,0,0-3.493,13.926,13.926,0,0,0-2.273-2.164c-1.38-1.125-2.572-2.1-2.572-3.8V1.361H95.655V3.289c0,1.7-1.192,2.675-2.572,3.8A13.927,13.927,0,0,0,90.81,9.253,3.613,3.613,0,0,0,90.81,12.747Z" transform="translate(0)" />
+                                        </g>
+                                    </svg>
+                                </span>
+                            </div>
+                            <div class="check fas fa-check"></div>
+                        </div>
+                        <div class="step">
+                            <p></p>
+                            <div class="bullet">
+                                <span class="firstNext icon-top">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14.516" height="22" fill="currentColor" color="#8c8c8c" viewBox="0 0 14.516 22">
+                                        <g id="wait" transform="translate(-82.5)">
+                                            <path id="Path_17598" data-name="Path 17598" d="M93.943,8.144c1.511-1.232,3.073-2.506,3.073-4.855V0H82.5V3.289c0,2.35,1.562,3.623,3.073,4.855a12.9,12.9,0,0,1,2.061,1.948A1.935,1.935,0,0,1,87.8,11a1.935,1.935,0,0,1-.162.908,12.9,12.9,0,0,1-2.061,1.948c-1.511,1.232-3.073,2.506-3.073,4.855V22H97.015V18.711c0-2.35-1.562-3.623-3.073-4.855a12.9,12.9,0,0,1-2.061-1.948A1.935,1.935,0,0,1,91.719,11a1.935,1.935,0,0,1,.162-.908A12.9,12.9,0,0,1,93.943,8.144Zm-3.133,4.6a13.927,13.927,0,0,0,2.273,2.164c1.38,1.125,2.572,2.1,2.572,3.8v1.928H83.861V18.711c0-1.7,1.192-2.675,2.572-3.8a13.926,13.926,0,0,0,2.273-2.164,3.613,3.613,0,0,0,0-3.493,13.926,13.926,0,0,0-2.273-2.164c-1.38-1.125-2.572-2.1-2.572-3.8V1.361H95.655V3.289c0,1.7-1.192,2.675-2.572,3.8A13.927,13.927,0,0,0,90.81,9.253,3.613,3.613,0,0,0,90.81,12.747Z" transform="translate(0)" />
+                                        </g>
+                                    </svg>
+                                </span>
+                            </div>
+                            <div class="check fas fa-times"></div>
+                        </div>
+                        <div class="step">
+                            <p></p>
+                            <div class="bullet">
+                                <span class="next-1 icon-top">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14.516" height="22" fill="currentColor" color="#8c8c8c" viewBox="0 0 14.516 22">
+                                        <g id="wait" transform="translate(-82.5)">
+                                            <path id="Path_17598" data-name="Path 17598" d="M93.943,8.144c1.511-1.232,3.073-2.506,3.073-4.855V0H82.5V3.289c0,2.35,1.562,3.623,3.073,4.855a12.9,12.9,0,0,1,2.061,1.948A1.935,1.935,0,0,1,87.8,11a1.935,1.935,0,0,1-.162.908,12.9,12.9,0,0,1-2.061,1.948c-1.511,1.232-3.073,2.506-3.073,4.855V22H97.015V18.711c0-2.35-1.562-3.623-3.073-4.855a12.9,12.9,0,0,1-2.061-1.948A1.935,1.935,0,0,1,91.719,11a1.935,1.935,0,0,1,.162-.908A12.9,12.9,0,0,1,93.943,8.144Zm-3.133,4.6a13.927,13.927,0,0,0,2.273,2.164c1.38,1.125,2.572,2.1,2.572,3.8v1.928H83.861V18.711c0-1.7,1.192-2.675,2.572-3.8a13.926,13.926,0,0,0,2.273-2.164,3.613,3.613,0,0,0,0-3.493,13.926,13.926,0,0,0-2.273-2.164c-1.38-1.125-2.572-2.1-2.572-3.8V1.361H95.655V3.289c0,1.7-1.192,2.675-2.572,3.8A13.927,13.927,0,0,0,90.81,9.253,3.613,3.613,0,0,0,90.81,12.747Z" transform="translate(0)" />
+                                        </g>
+                                    </svg>
+                                </span>
+                            </div>
+                            <div class="check fas fa-check"></div>
+                        </div>
+                        <div class="step">
+                            <p></p>
+                            <div class="bullet">
+                                <span class="next-2 icon-top">
+                                    <svg id="onhold" xmlns="http://www.w3.org/2000/svg" width="15.23" height="19.64" color="#8c8c8c" fill="currentColor" viewBox="0 0 15.23 19.64">
+                                        <g id="Layer_1" data-name="Layer 1">
+                                            <g id="onhold-2" data-name="onhold">
+                                                <path id="Path_17673" data-name="Path 17673" d="M5.41,19.64H1a1,1,0,0,1-1-1V1A1,1,0,0,1,1,0H5.41a1,1,0,0,1,1,1V18.64A1,1,0,0,1,5.41,19.64ZM2,17.64H4.41V2H2Z" />
+                                                <path id="Path_17674" data-name="Path 17674" d="M14.23,19.64H9.82a1,1,0,0,1-1-1V1a1,1,0,0,1,1-1h4.41a1,1,0,0,1,1,1V18.64A1,1,0,0,1,14.23,19.64Zm-3.41-2h2.41V2H10.82Z" />
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </span>
+                            </div>
+                            <div class="check fas fa-pause"></div>
+                        </div>
+                        <div class="step">
+                            <p></p>
+                            <div class="bullet">
+                                <span class="next-3 icon-top">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14.516" height="22" fill="currentColor" color="#8c8c8c" viewBox="0 0 14.516 22">
+                                        <g id="wait" transform="translate(-82.5)">
+                                            <path id="Path_17598" data-name="Path 17598" d="M93.943,8.144c1.511-1.232,3.073-2.506,3.073-4.855V0H82.5V3.289c0,2.35,1.562,3.623,3.073,4.855a12.9,12.9,0,0,1,2.061,1.948A1.935,1.935,0,0,1,87.8,11a1.935,1.935,0,0,1-.162.908,12.9,12.9,0,0,1-2.061,1.948c-1.511,1.232-3.073,2.506-3.073,4.855V22H97.015V18.711c0-2.35-1.562-3.623-3.073-4.855a12.9,12.9,0,0,1-2.061-1.948A1.935,1.935,0,0,1,91.719,11a1.935,1.935,0,0,1,.162-.908A12.9,12.9,0,0,1,93.943,8.144Zm-3.133,4.6a13.927,13.927,0,0,0,2.273,2.164c1.38,1.125,2.572,2.1,2.572,3.8v1.928H83.861V18.711c0-1.7,1.192-2.675,2.572-3.8a13.926,13.926,0,0,0,2.273-2.164,3.613,3.613,0,0,0,0-3.493,13.926,13.926,0,0,0-2.273-2.164c-1.38-1.125-2.572-2.1-2.572-3.8V1.361H95.655V3.289c0,1.7-1.192,2.675-2.572,3.8A13.927,13.927,0,0,0,90.81,9.253,3.613,3.613,0,0,0,90.81,12.747Z" transform="translate(0)" />
+                                        </g>
+                                    </svg>
+                                </span>
+                            </div>
+                            <div class="check fas fa-clock fa-3x" style="font-size: 1.1em !important; margin-top: -1px;"></div>
+                        </div>
+                    </div>
+                    <div class="form-outer">
+                        <form action="#" id="ApproverHistoryForm" style="justify-content:center">
+                        </form>
+                    </div>
+                    @*<div class="progress-bar" id="ApproverHistoryForm">
+                        </div>*@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- add Modal -->
+<div class="modal fade" id="add_success" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="success_pop text-center py-3"> <span class="icon-success pop-tick"></span> </div>
+            <div class="modal-body text-center">
+                <h4>Success!</h4>
+                <p id="success_msg"></p>
+            </div>
+            <div class="modal-footer pop_f_btn">
+                <button type="button" class="btn btn-secondary pop_btn" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- delete Modal -->
+<div class="modal fade" id="alert_delete" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <img src="~/img/wrong_active.png" alt="LOGO">
+                <h4 class="red_cl mt-2">Delete!</h4>
+                <p class="m-0">Do you really want to delete this Request? <br /> This process cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary second_btn" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary prime_btn px-4 font-weight-normal" onclick="Delete()">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Acknowledgement Disposal Popup--->
+<div class="modal fade" id="ack_popUp" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="add_Title">Disposal Request</h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-md-12 col-lg-12">
+                                <div class="form-group pwc_form col-md-12 mt-2">
+                                    <label for="inputState" id="disposeReq_Cmd_Lbl">Comments</label>
+                                    <textarea class="form-control" id="disposeReq_Cmd" rows="2" placeholder="Comments" required></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group pwc_form col-md-12 mt-2">
+                            <input type="checkbox" id="AckPopupcheckboxId" onchange="ACKChecked()" /><span> I Confirmed that to the best of my knowledge, this file is not an @UserPWC.Utilities.FileTypeName.Legal or any other hold</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary second_btn" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary prime_btn" id="btnDisposeDisable" style="background-color: #d04a02;" onclick="RequestAction(@UserPWC.Utilities.RequestType.Disposal_request)" Disabled>Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

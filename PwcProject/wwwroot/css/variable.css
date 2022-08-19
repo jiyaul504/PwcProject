@@ -1,0 +1,26 @@
+:root {
+    --primary-bg-color: #EB8C00;
+    --primary-text-color: #E0301E;
+    --primary-btn-color: #ffb600;
+    --submit-btn-color: #4eb523;
+    --table-yellow-fixed: #ffb600;
+    --dark-bg-color: #000000;
+    --default-bg-color: #ffffff;
+    --yellow-bg-color: #ffb600;
+    --light-grey-bg: #f8f8f8;
+    --Extra_light-grey-bg: #f1f1f1;
+    --price_bg_grey: #f1f1f1;
+    --transparent-bg: #fff0;
+    --default-text-color: #000000;
+    --grey-text-color: #A3A3A3;
+    --active-text-color: #86DB4F;
+    --inactive-text-color: #f44336;
+    --table-fixed-color: #ebebeb;
+	--default-box-shadow: 0 1px 6px rgb(32 33 36 / 28%);
+    --white-text-color: #ffffff;
+	--primary-font: Charter ITC Regular;
+	--second-font: Helvetica Neue;
+
+    --custom-color: #175c2c;
+    --custom-color-1: #7d7d7d;
+    }
