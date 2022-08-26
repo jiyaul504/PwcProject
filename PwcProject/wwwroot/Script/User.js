@@ -102,11 +102,11 @@ function loadData(page) {
                     html += '<td class="fnt14" style="cursor:pointer"><div class="tooltips"><span class="red_cl">' + mapped_LOS.length + " " + 'LOS<ul class="tooltiptext">';
 
                     for (var i = 0; i < mapped_LOS.length; i++) {
-                        html += "<li>" + mapped_LOS[i] + "</li>";
+                        html += "<li>" + mapped_LOS[i].replace("NaN","") + "</li>";
                     }
                     html += '</ul></span></div></td>';
 
-                    var mapped_SBU = item.sbu.split(',');
+                    var mapped_SBU = item.sbU_Code.split(',');
 
                     html += '<td class="fnt14" style="cursor:pointer"><div class="tooltips"><span class="red_cl">' + mapped_SBU.length + " " + 'SBU<ul class="tooltiptext">';
 
@@ -128,12 +128,12 @@ function loadData(page) {
                     html += '<td style="cursor:pointer" onclick="return getbyID(' + item.employee_ID + ')"><div class="text-center"><img src="img/edit.png"></div></td>';
                 }
 
-                if (item.name == actionBy/* || (item.role_ID == 7 && userRoleID == "7")*/) {
-                    html += '<td><div class="text-center">-</div></td>';
-                }
-                else {
-                    html += '<td style="cursor:pointer" onclick="return GetUsers(' + item.name + ')"><div class="text-center"><img src="img/view.png"></div></td>';
-                }
+                //if (item.name == actionBy/* || (item.role_ID == 7 && userRoleID == "7")*/) {
+                //    html += '<td><div class="text-center">-</div></td>';
+                //}
+                //else {
+                //    html += '<td style="cursor:pointer" onclick="return GetUsers(' + item.name + ')"><div class="text-center"><img src="img/view.png"></div></td>';
+                //}
                 html += '</tr>';
             });
             if (totalCount == 0) {

@@ -231,14 +231,24 @@ namespace UserPWC.Service
             }
             public List<FIMS_SBU_DTO> GetSBU(string losCode, string UserId, string UserRole)
              {
+                
+                //var a = "70000,12000,40000,20000".Split();
+                
                 List<FIMS_SBU_DTO> result = new List<FIMS_SBU_DTO>();
                 try
                 {
                     if (losCode != null && losCode != "")
                     {
-                        var TblStaff = _FIMSDbContext.TblStaff.Where(_ => _.SBUCode != null).DistinctBy(_ => _.SBUCode).ToList();
-                        TblStaff = TblStaff.Where(_ => losCode.Split(',').Contains(_.LOSCode)).ToList();
-                        result = TblStaff
+                    
+                        var tblStaff = _FIMSDbContext.TblStaff.Select(tblStaff => new {
+                            SBUCode = tblStaff.SBUCode,
+                            LOSCode = tblStaff.LOSCode,
+                            Organisation_SBU = tblStaff.Organisation_SBU,
+                            LOS = tblStaff.LOS
+                        }).Where(_ => _.SBUCode != null).DistinctBy(_ => _.SBUCode).ToList();
+                        tblStaff = tblStaff.Where(_ => losCode.Split(',').Contains(_.LOSCode)).ToList();
+                       // var example = TblStaff.Where(a=> losCode.Split(',').Contains(a.LOSCode)).ToList();
+                    result = tblStaff
                                  .Select((x) => new FIMS_SBU_DTO
                                  {
                                      SBU_Code = x.SBUCode,
@@ -246,7 +256,7 @@ namespace UserPWC.Service
                                      LOS_Name = x.LOS,
                                      LOS_Code = x.LOSCode,     
                                  }).OrderBy(_ => _.SBU_Name).Distinct().ToList();
-                   
+                    
                     //if (UserRole == UserRoles.Admin.ToString())
                     //{
                     //  //  var LosList = new List<string>(Los_Code.Split(',').Select(s => s));
@@ -263,7 +273,6 @@ namespace UserPWC.Service
                     //              }).OrderBy(_ => _.SBU_Name).Distinct().ToList();
 
                     //}
-
 
                 }
                 }

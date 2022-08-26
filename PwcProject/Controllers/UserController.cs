@@ -73,6 +73,10 @@ namespace UserPWC.Controllers
         [HttpGet]
         public List<FIMS_SBU_DTO> GetSBU(string losCode)
         {
+            if(losCode!=""&&losCode!=null)
+            {
+                losCode = losCode.Replace("NaN,", "");
+            }
             var Sbu = GetClaimValue(UserPWC.Utilities.ApplicationConstants.Claims.USER_SBU_CODE);
             var UserRole = GetClaimValue(UserPWC.Utilities.ApplicationConstants.Claims.USER_ROLE_ID);
             var UserId = GetClaimValue(UserPWC.Utilities.ApplicationConstants.Claims.EMPLOYEE_ID);

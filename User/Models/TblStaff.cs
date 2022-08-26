@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace UserPWC.Models
 {
+    
     public class TblStaff
     {
         public string EmployeeID { get; set; }
